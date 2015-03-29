@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/languages/javascript.min.js"></script>
+
+<style>
+#map_spot,#map_preview{height:300px;}
+#map_spot{width:400px;}
+.navbar-brand{padding:0;}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#"><img src="look.png"/></a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+          <li><a href="index.html">Home</a></li>
+      </ul>
+    </div>
+<div class="row">
+    <h1>Look Ma, a web map!</h1>
+    <p>Get the code for a simple web map and use it in your website!</p>
+</div>
+<div id="step_spot" class="row">
+<div class="col-md-6">
+    <div id="map_spot">
+    </div>
+</div>
+<div class="col-md-6">
+    <h2>Choose an area</h2>
+    <p>Drag the marker, set the zoom, and use the form below if you want to tweak the size.</p>
+    <div class="input-group" style="font-family:'Courier New', Courier, monospace;">
+      <div class="input-group-addon">Width&nbsp;</div>
+      <input type="number" class="form-control" id="map_width" value="400" onChange="resize_map()"/>
+    </div>
+    <div class="input-group" style="font-family:'Courier New', Courier, monospace;">
+      <div class="input-group-addon">Height</div>
+      <input type="number" class="form-control" id="map_height" value="300" onChange="resize_map()"/>
+    </div>
+    <button id="btn_spot" href="#choose" onclick="moveToChoose()" class="btn btn-info btn-md">Continue</button>
+</div>
+</div>
+<div id="step_choose" style="display:none;" class="row">
+    <div class="row">
+    <h2>Choose a target</h2>
+    <p>Different needs have different outcomes!</p>
+    </div>
+<div class="row">
+<div class="col-md-6">
+<p>The simplest application is an iframe: only an HTML tag to embed an OSM map! Mind this isn't usually allowed for simple users in some CMS (example: Wordpress.com).</p>
+<button id="btn_spot" href="#step_preview" onclick="moveToIframe()" class="btn btn-info btn-md">Iframe</button>
+</div>
+<div class="col-md-6">
+    <p>The Javascript solution makes use of the <a href="https://leafletjs.com">Leaflet JS</a> mapping library. It's simple and extendable but you need at least basic knowledge of the language.</p>
+<button id="btn_spot" href="#step_preview" onclick="moveToJavascript()" class="btn btn-info btn-md">Javascript</button>
+</div>
+</div>
+</div>
+<div id="step_preview" style="display:none;" class="row">
+<div class="col-md-6">
+<div id="map_preview"></div>
+</div>
+<div id="map_code" class="col-md-6"></div>
+<div id="map_code_header"></div>
+<div id="map_code_body"></div>
+</div>
+
+</div>
+<script>
+
+function resize_map(){
+$('#map_spot').css({'width':$('#map_width').val(),'height':$('#map_height').val()});
+map.invalidateSize({'debounceMoveend': true});
+}
+
+
+var map_center=[51.505, -0.09];
+var map_zoom=13;
+var map_bbox=0;
+
+var map = L.map('map_spot').setView(map_center, map_zoom);
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var mark=L.marker([51.5, -0.09],{draggable:true}).addTo(map);
+
+mark.on('dragend',function(e){
+    map_center=e.target._latlng;
+    map_zoom=map.getZoom();
+});
+
+map.on('zoomend',function(e){
+    map_zoom=map.getZoom();
+});
+
+hljs.initHighlightingOnLoad();
+
+function moveToChoose(){
+map_bbox=map.getBounds();
+$('#step_spot').hide();
+$('#step_choose').show();
+}
+
+function moveToIframe(){
+    $('#step_choose').hide();
+    //convert to bbox
+    var bboxstring=encodeURIComponent(map_bbox.toBBoxString());
+    $('#map_preview').append('<iframe width="'+$('#map_width').val()+'" height="'+$('#map_height').val()+'" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox='+bboxstring+'&amp;layer=mapnik&amp;marker='+mark.getLatLng()['lat']+'%2C'+mark.getLatLng()['lng']+'" style="border: 1px solid black"></iframe>');
+
+    var text='<pre><code class="html">';
+    text+=htmlentities('<iframe width="'+$('#map_width').val()+'" height="'+$('#map_height').val()+'" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox='+bboxstring+'&amp;layer=mapnik&amp;marker='+mark.getLatLng()['lat']+'%2C'+mark.getLatLng()['lng']+'" style="border: 1px solid black"></iframe>');
+    text+='</code></pre>';
+    $('#map_code_body').append(text);
+
+    $('#step_preview').show();
+}
+
+function moveToJavascript(){
+    $('#step_choose').hide();
+    $('#map_preview').css({'width':$('#map_width').val(),'height':$('#map_height').val()});
+
+    $('#step_preview').show();
+
+    var map2 = L.map('map_preview').setView(map_center, map_zoom);
+
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map2);
+
+    var mark=L.marker(map_center).addTo(map2);
+
+    var text='<p>Copy this code in the head tag</p><pre><code class="javascript">';
+    text+='&lt;link rel=&quot;stylesheet&quot; href=&quot;http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css&quot; /&gt;<br/>&lt;script src=&quot;http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js&quot;&gt;&lt;/script&gt;';
+    text+='</code></pre>';
+    $('#map_code_header').append(text);
+
+    var text='<p>Copy this code in the desired position</p><pre><code class="javascript">';
+    text+="&lt;div id=&#39;map_preview&#39; style=&#39;width:"+$('#map_width').val()+"px;height:"+$('#map_height').val()+"px;&#39; &gt;&lt;/div&gt;<br/>&lt;script&gt; var map2 = L.map(&#39;map_preview&#39;).setView("+map_center+", "+map_zoom+");L.tileLayer(&#39;http://{s}.tile.osm.org/{z}/{x}/{y}.png&#39;, {attribution: &#39;&amp;copy; &lt;a href=\&quot;http://osm.org/copyright\&quot;&gt;OpenStreetMap&lt;/a&gt; contributors&#39;}).addTo(map2);var mark=L.marker(["+mark.getLatLng()['lng']+","+mark.getLatLng()['lat']+"]).addTo(map2);&lt;/script&gt;";
+    text+='</code></pre>';
+    $('#map_code_body').append(text);
+
+}
+
+
+function htmlentities(string) {
+string=string.replace('\n','<br/>').replace('<','&lt;').replace('>','&gt;');
+  return string;
+}
+</script>
+</body>
+</html>
