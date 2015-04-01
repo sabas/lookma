@@ -18,6 +18,7 @@
     <style>
     #map_spot,#map_preview{height:300px;}
     #map_spot{width:400px;}
+	#map_code{background-color:white;}
     .navbar-brand{padding:0;}
     </style>
 </head>
@@ -36,55 +37,65 @@
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
           <li><a href="index.html">Home</a></li>
+          <li><a href="https://github.com/sabas/lookma" target="_blank">Github</a></li>
       </ul>
     </div>
 <div class="row">
     <h1>Look Ma, a web map!</h1>
     <p>Get the code for a simple web map and use it in your website!</p>
 </div>
+
 <div id="step_spot" class="row">
-<div class="col-md-6">
-    <div id="map_spot">
-    </div>
+	<div class="row">
+	<div class="col-md-6">
+		<h2>Choose an area</h2>
+		<p>Drag the marker (or position it with a right click), set the zoom, and use the form if you want to tweak the size, then press Continue.</p>
+	</div>
+	<div class="col-md-6">
+		<div class="input-group col-lg-6" style="font-family:'Courier New', Courier, monospace;">
+		  <div class="input-group-addon">Width&nbsp;</div>
+		  <input type="number" class="form-control" id="map_width" value="400" onChange="resize_map()"/>
+		</div>
+		<div class="input-group col-lg-6" style="font-family:'Courier New', Courier, monospace;">
+		  <div class="input-group-addon">Height</div>
+		  <input type="number" class="form-control" id="map_height" value="300" onChange="resize_map()"/>
+		</div>
+		<button id="btn_spot" href="#choose" onclick="moveToChoose()" class="btn btn-info btn-md">Continue</button>
+	</div>
+	</div>
+	<div class="row">
+	<div class="col-md-12">
+		<div id="map_spot">
+		</div>
+	</div>
+	</div>
 </div>
-<div class="col-md-6">
-    <h2>Choose an area</h2>
-    <p>Drag the marker (or position it with a right click), set the zoom, and use the form below if you want to tweak the size.</p>
-    <div class="input-group" style="font-family:'Courier New', Courier, monospace;">
-      <div class="input-group-addon">Width&nbsp;</div>
-      <input type="number" class="form-control" id="map_width" value="400" onChange="resize_map()"/>
-    </div>
-    <div class="input-group" style="font-family:'Courier New', Courier, monospace;">
-      <div class="input-group-addon">Height</div>
-      <input type="number" class="form-control" id="map_height" value="300" onChange="resize_map()"/>
-    </div>
-    <button id="btn_spot" href="#choose" onclick="moveToChoose()" class="btn btn-info btn-md">Continue</button>
-</div>
-</div>
+
 <div id="step_choose" style="display:none;" class="row">
     <div class="row">
     <h2>Choose a target</h2>
     <p>Different needs have different outcomes!</p>
     </div>
-<div class="row">
-<div class="col-md-6">
-<p>The simplest application is an iframe: only an HTML tag to embed an OSM map! Mind this isn't usually allowed for simple users in some CMS (example: Wordpress.com).</p>
-<button id="btn_spot" href="#step_preview" onclick="moveToIframe()" class="btn btn-info btn-md">Iframe</button>
+	<div class="row">
+	<div class="col-md-6">
+	<p>The simplest application is an iframe: only an HTML tag to embed an OSM map! Mind this isn't usually allowed for simple users in some CMS (example: Wordpress.com).</p>
+	<button id="btn_spot" href="#step_preview" onclick="moveToIframe()" class="btn btn-info btn-md">Iframe</button>
+	</div>
+	<div class="col-md-6">
+		<p>The Javascript solution makes use of the <a href="https://leafletjs.com">Leaflet JS</a> mapping library. It's simple and extendable but you need at least basic knowledge of the language.</p>
+	<button id="btn_spot" href="#step_preview" onclick="moveToJavascript()" class="btn btn-info btn-md">Javascript</button>
+	</div>
+	</div>
 </div>
-<div class="col-md-6">
-    <p>The Javascript solution makes use of the <a href="https://leafletjs.com">Leaflet JS</a> mapping library. It's simple and extendable but you need at least basic knowledge of the language.</p>
-<button id="btn_spot" href="#step_preview" onclick="moveToJavascript()" class="btn btn-info btn-md">Javascript</button>
-</div>
-</div>
-</div>
+
 <div id="step_preview" style="display:none;" class="row">
-<div class="col-md-6">
-<div id="map_preview"></div>
-</div>
-<div id="map_code" class="col-md-6">
-<div id="map_code_header"></div>
-<div id="map_code_body"></div>
-</div>
+	<div class="col-md-6">
+	<div id="map_preview"></div>
+	</div>
+	<div id="map_code" class="col-md-6">
+		<div id="map_code_header"></div>
+		<div id="map_code_body"></div>
+	</div>
 </div>
 
 </div>
@@ -136,7 +147,7 @@ function moveToIframe(){
     var bboxstring=encodeURIComponent(map_bbox.toBBoxString());
     $('#map_preview').append('<iframe width="'+$('#map_width').val()+'" height="'+$('#map_height').val()+'" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox='+bboxstring+'&amp;layer=mapnik&amp;marker='+mark.getLatLng()['lat']+'%2C'+mark.getLatLng()['lng']+'" style="border: 1px solid black"></iframe>');
 
-    var text='<pre><code class="html">';
+    var text='<p>Copy this code in the desired position</p><pre><code class="html">';
     text+='&lt;iframe width="'+$('#map_width').val()+'" height="'+$('#map_height').val()+'" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox='+bboxstring+'&amp;layer=mapnik&amp;marker='+mark.getLatLng()['lat']+'%2C'+mark.getLatLng()['lng']+'" style="border: 1px solid black"&gt;&lt;/iframe&gt;';
     text+='</code></pre>';
 
