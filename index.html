@@ -79,12 +79,21 @@
     </div>
 	<div class="row">
 	<div class="col-md-6">
+    <h3>Iframe</h3>
 	<p>The simplest application is an iframe: only an HTML tag to embed an OSM map! Mind this isn't usually allowed for simple users in some CMS (example: Wordpress.com).</p>
 	<button id="btn_spot" href="#step_preview" onclick="moveToIframe()" class="btn btn-info btn-md">Iframe</button>
 	</div>
 	<div class="col-md-6">
-		<p>The Javascript solution makes use of the <a href="https://leafletjs.com">Leaflet JS</a> mapping library. It's simple and extendable but you need at least basic knowledge of the language.</p>
+    <h3>Javascript</h3>
+	<p>The Javascript solution makes use of the <a href="https://leafletjs.com">Leaflet JS</a> mapping library. It's simple and extendable but you need at least basic knowledge of the language.</p>
 	<button id="btn_spot" href="#step_preview" onclick="moveToJavascript()" class="btn btn-info btn-md">Javascript</button>
+	</div>
+	</div>
+	<div class="row">
+	<div class="col-md-6">
+    <h3>Wordpress</h3>
+	<p>The <a href="http://wp-osm-plugin.hanblog.net/" target="_blank">WP OSM plugin</a> is a simple plugin which lets you embed OSM maps in a Wordpress website.</p>
+	<button id="btn_spot" href="#step_preview" onclick="moveToWP()" class="btn btn-info btn-md">Wordpress</button>
 	</div>
 	</div>
 </div>
@@ -156,7 +165,6 @@ function moveToIframe(){
     hljs.highlightBlock(block);
   });
     $('#step_preview').show();
-	
 }
 
 //javascript step
@@ -188,9 +196,22 @@ function moveToJavascript(){
     $('#map_code_body').append(text).find('code').each(function(i, block) {
     hljs.highlightBlock(block);
   });
-
 }
 
+//wordpress step
+function moveToWP(){
+    $('#step_choose').hide();
+    $('#map_preview').append('');
+
+    var text='<p>Copy this code in the desired position</p><pre><code class="bbcode">';
+    text+='[osm_map lat="'+map_center[0]+'" lon="'+map_center[1]+'" zoom="'+map_zoom+'" width="'+$('#map_width').val()+'" height="'+$('#map_height').val()+'" marker="'+mark.getLatLng()['lng']+','+mark.getLatLng()['lat']+'"]';
+    text+='</code></pre>';
+
+   $('#map_code_body').append(text).find('code').each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+    $('#step_preview').show();
+}
 </script>
 </body>
 </html>
